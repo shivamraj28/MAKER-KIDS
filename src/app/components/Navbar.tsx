@@ -18,7 +18,9 @@ export default function Navbar() {
     { path: '/', label: '🏠 Home' },
     { path: '/projects', label: '🗂 Projects' },
     { path: '/rewards', label: '🏆 Rewards' },
+    { path: '/feedback', label: '📝 Feedback' },
     { path: '/chat', label: '💬 Chat' },
+    { path: '/contact', label: '� Contact' },
     { path: '/profile', label: '👤 Profile' }
   ];
 

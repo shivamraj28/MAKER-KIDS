@@ -1,0 +1,672 @@
+import { useState } from 'react';
+import { useApp } from '../context/AppContext';
+import { toast } from '../components/Toast';
+
+export default function Contact() {
+  const { state } = useApp();
+  const [formData, setFormData] = useState({
+    name: state.user?.name || '',
+    email: state.user?.email || '',
+    subject: '',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast('⚠️ Please fill in all fields');
+      return;
+    }
+
+    if (!formData.email.includes('@')) {
+      toast('⚠️ Please enter a valid email');
+      return;
+    }
+
+    // Simulate submission
+    setSubmitted(true);
+    toast('📧 Message sent successfully!');
+    
+    // Reset form after 3 seconds
+    setTimeout(() => {
+      setSubmitted(false);
+      setFormData({
+        name: state.user?.name || '',
+        email: state.user?.email || '',
+        subject: '',
+        message: ''
+      });
+    }, 3000);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  return (
+    <div style={{ padding: 'clamp(3rem, 8vw, 6rem) clamp(1rem, 5vw, 3rem)', minHeight: 'calc(100vh - var(--nav-h))' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-purple)', marginBottom: '0.8rem', justifyContent: 'center' }}>
+            📞 Get in Touch
+          </div>
+          <div style={{ content: '', display: 'block', width: '60px', height: '4px', background: 'var(--g-hero)', borderRadius: '4px', margin: '0.8rem auto 0' }} />
+          <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', color: 'var(--c-text)', margin: '1.2rem 0 0.6rem' }}>Contact Us</h2>
+          <p style={{ color: 'var(--c-text2)', fontSize: '1.05rem', fontWeight: 500, maxWidth: '620px', lineHeight: 1.8, margin: '0 auto' }}>
+            Have questions, suggestions, or just want to say hi? We'd love to hear from you! Our team is here to help make your making experience awesome! 🎨🔧
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '3rem' }}>
+          {/* Contact Form */}
+          <div
+            style={{
+              background: 'var(--c-surface)',
+              border: '1.5px solid var(--c-border)',
+              borderRadius: 'var(--r)',
+              padding: '2rem',
+              boxShadow: 'var(--sh-xl)',
+              animation: 'fUp 0.4s var(--ease)'
+            }}
+          >
+            <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--c-text)', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              📝 Send us a Message
+            </h3>
+
+            {!submitted ? (
+              <form onSubmit={handleSubmit}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      color: 'var(--c-text2)',
+                      marginBottom: '0.5rem'
+                    }}
+                  >
+                    Your Name <span style={{ color: 'var(--c-red)' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Young Maker"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem 1rem',
+                      borderRadius: '12px',
+                      border: '1.5px solid var(--c-border)',
+                      background: 'var(--c-bg)',
+                      color: 'var(--c-text)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.93rem',
+                      fontWeight: 600,
+                      transition: 'border-color 0.2s, box-shadow 0.2s'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-purple)';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124, 58, 237, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-border)';
+                      e.currentTarget.style.boxShadow = '';
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      color: 'var(--c-text2)',
+                      marginBottom: '0.5rem'
+                    }}
+                  >
+                    Email Address <span style={{ color: 'var(--c-red)' }}>*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="your@email.com"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem 1rem',
+                      borderRadius: '12px',
+                      border: '1.5px solid var(--c-border)',
+                      background: 'var(--c-bg)',
+                      color: 'var(--c-text)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.93rem',
+                      fontWeight: 600,
+                      transition: 'border-color 0.2s, box-shadow 0.2s'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-purple)';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124, 58, 237, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-border)';
+                      e.currentTarget.style.boxShadow = '';
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      color: 'var(--c-text2)',
+                      marginBottom: '0.5rem'
+                    }}
+                  >
+                    Subject <span style={{ color: 'var(--c-red)' }}>*</span>
+                  </label>
+                  <select
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem 1rem',
+                      borderRadius: '12px',
+                      border: '1.5px solid var(--c-border)',
+                      background: 'var(--c-bg)',
+                      color: 'var(--c-text)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.93rem',
+                      fontWeight: 600,
+                      transition: 'border-color 0.2s, box-shadow 0.2s',
+                      cursor: 'pointer'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-purple)';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124, 58, 237, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-border)';
+                      e.currentTarget.style.boxShadow = '';
+                    }}
+                  >
+                    <option value="">Select a subject...</option>
+                    <option value="question">❓ General Question</option>
+                    <option value="support">🆘 Technical Support</option>
+                    <option value="project">🎨 Project Help</option>
+                    <option value="partnership">🤝 Partnership Inquiry</option>
+                    <option value="media">📰 Media & Press</option>
+                    <option value="other">💬 Other</option>
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      color: 'var(--c-text2)',
+                      marginBottom: '0.5rem'
+                    }}
+                  >
+                    Message <span style={{ color: 'var(--c-red)' }}>*</span>
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Tell us how we can help you..."
+                    required
+                    rows={6}
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem 1rem',
+                      borderRadius: '12px',
+                      border: '1.5px solid var(--c-border)',
+                      background: 'var(--c-bg)',
+                      color: 'var(--c-text)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.93rem',
+                      fontWeight: 600,
+                      transition: 'border-color 0.2s, box-shadow 0.2s',
+                      resize: 'vertical'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-purple)';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(124, 58, 237, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--c-border)';
+                      e.currentTarget.style.boxShadow = '';
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  style={{
+                    width: '100%',
+                    padding: '1.05rem',
+                    borderRadius: '16px',
+                    background: 'var(--g-hero)',
+                    color: '#fff',
+                    fontFamily: "'Fredoka One', cursive",
+                    fontSize: '1.15rem',
+                    letterSpacing: '0.02em',
+                    boxShadow: '0 8px 24px rgba(124, 58, 237, 0.4)',
+                    transition: 'transform 0.25s var(--spring), box-shadow 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.6rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
+                    e.currentTarget.style.boxShadow = '0 14px 36px rgba(124, 58, 237, 0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(124, 58, 237, 0.4)';
+                  }}
+                >
+                  📤 Send Message
+                </button>
+              </form>
+            ) : (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '2rem 1rem',
+                  animation: 'fUp 0.4s var(--ease)'
+                }}
+              >
+                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</div>
+                <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.6rem', color: 'var(--c-text)', marginBottom: '0.8rem' }}>
+                  Message Sent!
+                </h3>
+                <p style={{ fontSize: '1rem', color: 'var(--c-text2)', lineHeight: 1.7, fontWeight: 500 }}>
+                  Thanks for reaching out! We'll get back to you as soon as possible. Keep making awesome projects! 🎨
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Contact Info */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div
+              style={{
+                background: 'var(--c-surface)',
+                border: '1.5px solid var(--c-border)',
+                borderRadius: 'var(--r)',
+                padding: '1.8rem',
+                boxShadow: 'var(--sh-md)',
+                animation: 'fUp 0.4s var(--ease) 0.1s backwards',
+                transition: 'transform 0.2s var(--spring), box-shadow 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = 'var(--sh-xl)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = '';
+                e.currentTarget.style.boxShadow = 'var(--sh-md)';
+              }}
+            >
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>📧</div>
+              <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.2rem', color: 'var(--c-text)', marginBottom: '0.4rem' }}>
+                Email Us
+              </h4>
+              <p style={{ fontSize: '0.9rem', color: 'var(--c-text2)', marginBottom: '0.8rem', lineHeight: 1.6, fontWeight: 500 }}>
+                Send us an email and we'll respond within 24 hours
+              </p>
+              <a
+                href="mailto:hello@makerkids.com"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontSize: '1rem',
+                  color: 'var(--c-purple)',
+                  fontWeight: 700,
+                  transition: 'transform 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(4px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = ''}
+              >
+                hello@makerkids.com →
+              </a>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--c-surface)',
+                border: '1.5px solid var(--c-border)',
+                borderRadius: 'var(--r)',
+                padding: '1.8rem',
+                boxShadow: 'var(--sh-md)',
+                animation: 'fUp 0.4s var(--ease) 0.2s backwards',
+                transition: 'transform 0.2s var(--spring), box-shadow 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = 'var(--sh-xl)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = '';
+                e.currentTarget.style.boxShadow = 'var(--sh-md)';
+              }}
+            >
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>🤖</div>
+              <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.2rem', color: 'var(--c-text)', marginBottom: '0.4rem' }}>
+                Chat with MakerBot
+              </h4>
+              <p style={{ fontSize: '0.9rem', color: 'var(--c-text2)', marginBottom: '0.8rem', lineHeight: 1.6, fontWeight: 500 }}>
+                Get instant answers from our AI assistant
+              </p>
+              <a
+                href="/chat"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontSize: '1rem',
+                  color: 'var(--c-purple)',
+                  fontWeight: 700,
+                  transition: 'transform 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(4px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = ''}
+              >
+                Start Chatting →
+              </a>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--c-surface)',
+                border: '1.5px solid var(--c-border)',
+                borderRadius: 'var(--r)',
+                padding: '1.8rem',
+                boxShadow: 'var(--sh-md)',
+                animation: 'fUp 0.4s var(--ease) 0.3s backwards',
+                transition: 'transform 0.2s var(--spring), box-shadow 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = 'var(--sh-xl)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = '';
+                e.currentTarget.style.boxShadow = 'var(--sh-md)';
+              }}
+            >
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>🌍</div>
+              <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.2rem', color: 'var(--c-text)', marginBottom: '0.4rem' }}>
+                Join Our Community
+              </h4>
+              <p style={{ fontSize: '0.9rem', color: 'var(--c-text2)', marginBottom: '0.8rem', lineHeight: 1.6, fontWeight: 500 }}>
+                Connect with other young makers around the world
+              </p>
+              <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                <a
+                  href="#"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'var(--g-c1)',
+                    color: '#fff',
+                    fontSize: '1.2rem',
+                    boxShadow: 'var(--sh-sm)',
+                    transition: 'transform 0.2s var(--spring), box-shadow 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px) scale(1.1)';
+                    e.currentTarget.style.boxShadow = 'var(--sh-md)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = 'var(--sh-sm)';
+                  }}
+                >
+                  📘
+                </a>
+                <a
+                  href="#"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'var(--g-c2)',
+                    color: '#fff',
+                    fontSize: '1.2rem',
+                    boxShadow: 'var(--sh-sm)',
+                    transition: 'transform 0.2s var(--spring), box-shadow 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px) scale(1.1)';
+                    e.currentTarget.style.boxShadow = 'var(--sh-md)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = 'var(--sh-sm)';
+                  }}
+                >
+                  🐦
+                </a>
+                <a
+                  href="#"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'var(--g-hero)',
+                    color: '#fff',
+                    fontSize: '1.2rem',
+                    boxShadow: 'var(--sh-sm)',
+                    transition: 'transform 0.2s var(--spring), box-shadow 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px) scale(1.1)';
+                    e.currentTarget.style.boxShadow = 'var(--sh-md)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = 'var(--sh-sm)';
+                  }}
+                >
+                  📷
+                </a>
+                <a
+                  href="#"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #ff0000, #cc0000)',
+                    color: '#fff',
+                    fontSize: '1.2rem',
+                    boxShadow: 'var(--sh-sm)',
+                    transition: 'transform 0.2s var(--spring), box-shadow 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px) scale(1.1)';
+                    e.currentTarget.style.boxShadow = 'var(--sh-md)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = 'var(--sh-sm)';
+                  }}
+                >
+                  📺
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div
+          style={{
+            background: 'var(--c-surface)',
+            border: '1.5px solid var(--c-border)',
+            borderRadius: 'var(--r)',
+            padding: '2.5rem',
+            boxShadow: 'var(--sh-xl)',
+            animation: 'fUp 0.4s var(--ease) 0.4s backwards'
+          }}
+        >
+          <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.8rem', color: 'var(--c-text)', marginBottom: '1.5rem', textAlign: 'center' }}>
+            ❓ Frequently Asked Questions
+          </h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div
+              style={{
+                padding: '1.5rem',
+                background: 'var(--c-bg)',
+                borderRadius: '16px',
+                border: '1.5px solid var(--c-border)',
+                transition: 'transform 0.2s var(--spring)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = ''}
+            >
+              <h4 style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--c-text)', marginBottom: '0.5rem' }}>
+                🤔 How do I get started?
+              </h4>
+              <p style={{ fontSize: '0.88rem', color: 'var(--c-text2)', lineHeight: 1.6, fontWeight: 500 }}>
+                Simply browse our projects, pick one that interests you, and follow the step-by-step instructions. No experience needed!
+              </p>
+            </div>
+
+            <div
+              style={{
+                padding: '1.5rem',
+                background: 'var(--c-bg)',
+                borderRadius: '16px',
+                border: '1.5px solid var(--c-border)',
+                transition: 'transform 0.2s var(--spring)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = ''}
+            >
+              <h4 style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--c-text)', marginBottom: '0.5rem' }}>
+                💰 Is MakerKids free?
+              </h4>
+              <p style={{ fontSize: '0.88rem', color: 'var(--c-text2)', lineHeight: 1.6, fontWeight: 500 }}>
+                Yes! All our projects and resources are completely free. We want every kid to have access to awesome making activities.
+              </p>
+            </div>
+
+            <div
+              style={{
+                padding: '1.5rem',
+                background: 'var(--c-bg)',
+                borderRadius: '16px',
+                border: '1.5px solid var(--c-border)',
+                transition: 'transform 0.2s var(--spring)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = ''}
+            >
+              <h4 style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--c-text)', marginBottom: '0.5rem' }}>
+                👨‍👩‍👧‍👦 Can parents help?
+              </h4>
+              <p style={{ fontSize: '0.88rem', color: 'var(--c-text2)', lineHeight: 1.6, fontWeight: 500 }}>
+                Absolutely! We encourage parents to make alongside their kids. It's a great bonding experience and you'll both learn something new!
+              </p>
+            </div>
+
+            <div
+              style={{
+                padding: '1.5rem',
+                background: 'var(--c-bg)',
+                borderRadius: '16px',
+                border: '1.5px solid var(--c-border)',
+                transition: 'transform 0.2s var(--spring)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = ''}
+            >
+              <h4 style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--c-text)', marginBottom: '0.5rem' }}>
+                🎨 Can I suggest a project?
+              </h4>
+              <p style={{ fontSize: '0.88rem', color: 'var(--c-text2)', lineHeight: 1.6, fontWeight: 500 }}>
+                Yes! We'd love to hear your ideas. Use our feedback form or send us a message and tell us what you'd like to make!
+              </p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: '2rem',
+              padding: '1.5rem',
+              background: 'var(--c-bg2)',
+              borderRadius: '16px',
+              border: '1.5px solid var(--c-border)',
+              textAlign: 'center'
+            }}
+          >
+            <p style={{ fontSize: '0.95rem', color: 'var(--c-text2)', lineHeight: 1.7, fontWeight: 600 }}>
+              💡 <strong>Still have questions?</strong> Don't hesitate to reach out! We're here to help you make amazing things.
+            </p>
+          </div>
+        </div>
+
+        {/* Response Time Notice */}
+        <div
+          style={{
+            marginTop: '2rem',
+            padding: '1.2rem',
+            background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.1))',
+            borderRadius: '16px',
+            border: '1.5px solid var(--c-border)',
+            textAlign: 'center'
+          }}
+        >
+          <p style={{ fontSize: '0.9rem', color: 'var(--c-text2)', lineHeight: 1.7, fontWeight: 600 }}>
+            ⏰ <strong>Response Time:</strong> We typically respond to all messages within 24 hours during business days. Thanks for your patience!
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          [style*="grid-template-columns: 1fr 1fr"]:first-of-type {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 600px) {
+          [style*="grid-template-columns: 1fr 1fr"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
