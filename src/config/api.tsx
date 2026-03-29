@@ -1,3 +1,3 @@
-const BASE_URL = "https://makers-kid-backend.onrender.com";
+const BASE_URL = "https://maker-kid-backend-live.onrender.com";
 
 export default BASE_URL;
