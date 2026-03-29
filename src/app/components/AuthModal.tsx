@@ -24,41 +24,63 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
 
  const handleLogin = async () => {
   if (!loginEmail || !loginPassword) {
-    toast('⚠️ Fill all fields');
+    toast("⚠️ Fill all fields");
     return;
   }
 
-  
+  const url = `${BASE_URL}/api/auth/login`;
+
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include" as RequestCredentials,
+    body: JSON.stringify({
+      email: loginEmail,
+      password: loginPassword,
+    }),
+  };
+
+  const fetchWithRetry = async (retries = 2): Promise<any> => {
+    try {
+      const res = await fetch(url, options);
+
+      const contentType = res.headers.get("content-type");
+
+      // ✅ Handle non-JSON (Render cold start / HTML response)
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("Non-JSON response:", text);
+        throw new Error("⏳ Server is waking up, please try again...");
+      }
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      return data;
+
+    } catch (err) {
+      if (retries > 0) {
+        console.warn("Retrying login...", retries);
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // wait 2 sec
+        return fetchWithRetry(retries - 1);
+      }
+      throw err;
+    }
+  };
 
   try {
-    console.log("Making login request to:", `${BASE_URL}/api/auth/login`);
-    const res = await fetch(`${BASE_URL}/api/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        email: loginEmail,
-        password: loginPassword,
-      }),
-    });
-
-    console.log("Login response status:", res.status);
-    const data = await res.json();
-    console.log("Login response data:", data);
-
-    if (!res.ok) {
-      throw new Error(data.message || "Login failed");
-    }
+    const data = await fetchWithRetry();
 
     updateUser(data.user);
     toast(`👋 Welcome back, ${data.user.name}!`);
-    console.log("About to close modal and navigate");
+
     onClose();
-    console.log("Modal closed, navigating to /");
     navigate("/");
-    console.log("Navigation called");
 
   } catch (err: any) {
     toast(err.message || "Login failed");
