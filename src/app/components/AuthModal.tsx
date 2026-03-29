@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { toast } from './Toast';
+// import BASE_URL from '../../config/api';
+const BASE_URL = "http://localhost:3000";
+import { useNavigate } from "react-router";
 
 interface AuthModalProps {
   open: boolean;
@@ -9,6 +12,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ open, onClose }: AuthModalProps) {
   const { updateUser } = useApp();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<'login' | 'signup'>('login');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -18,25 +22,96 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
 
   if (!open) return null;
 
-  const handleLogin = () => {
-    if (!loginEmail || !loginPassword) {
-      toast('⚠️ Fill all fields');
-      return;
-    }
-    updateUser({ name: loginEmail.split('@')[0], email: loginEmail });
-    toast(`👋 Welcome back, ${loginEmail.split('@')[0]}!`);
-    onClose();
-  };
+ const handleLogin = async () => {
+  if (!loginEmail || !loginPassword) {
+    toast('⚠️ Fill all fields');
+    return;
+  }
 
-  const handleSignup = () => {
-    if (!signupName || !signupEmail || !signupPassword) {
-      toast('⚠️ Fill all fields');
-      return;
+  
+
+  try {
+    console.log("Making login request to:", `${BASE_URL}/api/auth/login`);
+    const res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        email: loginEmail,
+        password: loginPassword,
+      }),
+    });
+
+    console.log("Login response status:", res.status);
+    const data = await res.json();
+    console.log("Login response data:", data);
+
+    if (!res.ok) {
+      throw new Error(data.message || "Login failed");
     }
-    updateUser({ name: signupName, email: signupEmail });
-    toast(`🎉 Welcome, ${signupName}!`);
+
+    updateUser(data.user);
+    toast(`👋 Welcome back, ${data.user.name}!`);
+    console.log("About to close modal and navigate");
     onClose();
-  };
+    console.log("Modal closed, navigating to /");
+    navigate("/");
+    console.log("Navigation called");
+
+  } catch (err: any) {
+    toast(err.message || "Login failed");
+  }
+};
+
+
+
+const handleSignup = async () => {
+  if (!signupName || !signupEmail || !signupPassword) {
+    toast('⚠️ Fill all fields');
+    return;
+  }
+
+  try {
+    console.log("BASE_URL:", BASE_URL);
+    console.log("Making signup request to:", `${BASE_URL}/api/auth/signup`);
+    const res = await fetch(`${BASE_URL}/api/auth/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        name: signupName,
+        email: signupEmail,
+        password: signupPassword,
+      }),
+    });
+
+    console.log("Response status:", res.status);
+    const data = await res.json();
+    console.log("Response data:", data);
+
+    if (!res.ok) {
+      throw new Error(data.message || "Signup failed");
+    }
+
+    const user = data.data;
+
+    updateUser(user);
+    toast(`🎉 Welcome, ${user.name || "User"}!`);
+    console.log("About to close modal and navigate after signup");
+    navigate("/");  
+    onClose();
+    console.log("Signup navigation completed");
+
+  } catch (err: any) {
+    console.error(err);
+    toast(err.message || "Signup failed");
+  }
+};
+
 
   return (
     <div

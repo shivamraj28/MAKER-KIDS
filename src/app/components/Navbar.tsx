@@ -25,11 +25,7 @@ export default function Navbar() {
   ];
 
   const handleAuthClick = () => {
-    if (state.user) {
-      window.location.href = '/profile';
-    } else {
-      setAuthModalOpen(true);
-    }
+    setAuthModalOpen(true);
   };
 
   return (

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { toast } from '../components/Toast';
+// import BASE_URL from '../../config/api';
+const BASE_URL = "http://localhost:3000";
 
 export default function Contact() {
   const { state } = useApp();
@@ -12,7 +14,7 @@ export default function Contact() {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
@@ -25,20 +27,42 @@ export default function Contact() {
       return;
     }
 
-    // Simulate submission
-    setSubmitted(true);
-    toast('📧 Message sent successfully!');
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        name: state.user?.name || '',
-        email: state.user?.email || '',
-        subject: '',
-        message: ''
+    try {
+      const res = await fetch(`${BASE_URL}/api/contact/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }),
       });
-    }, 3000);
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to send message');
+      }
+
+      setSubmitted(true);
+      toast('📧 Message sent successfully!');
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          name: state.user?.name || '',
+          email: state.user?.email || '',
+          subject: '',
+          message: ''
+        });
+      }, 3000);
+    } catch (err: any) {
+      toast(err.message || 'Failed to send message');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -202,12 +226,12 @@ export default function Contact() {
                     }}
                   >
                     <option value="">Select a subject...</option>
-                    <option value="question">❓ General Question</option>
-                    <option value="support">🆘 Technical Support</option>
-                    <option value="project">🎨 Project Help</option>
-                    <option value="partnership">🤝 Partnership Inquiry</option>
-                    <option value="media">📰 Media & Press</option>
-                    <option value="other">💬 Other</option>
+                    <option value="General Question">❓ General Question</option>
+                    <option value="Technical Support">🆘 Technical Support</option>
+                    <option value="Project Help">🎨 Project Help</option>
+                    <option value="Partnership Inquiry">🤝 Partnership Inquiry</option>
+                    <option value="Media & Press">📰 Media & Press</option>
+                    <option value="Other">💬 Other</option>
                   </select>
                 </div>
 

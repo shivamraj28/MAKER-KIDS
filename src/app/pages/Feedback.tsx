@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { toast } from '../components/Toast';
+// import BASE_URL from '../../config/api';
+const BASE_URL = "http://localhost:3000";
 
 export default function Feedback() {
   const { state } = useApp();
@@ -13,7 +15,7 @@ export default function Feedback() {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.message) {
@@ -21,42 +23,64 @@ export default function Feedback() {
       return;
     }
 
-    // Simulate submission
-    setSubmitted(true);
-    toast('🎉 Thank you for your feedback!');
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        name: state.user?.name || '',
-        email: state.user?.email || '',
-        category: 'general',
-        rating: 5,
-        message: ''
+    try {
+      const res = await fetch(`${BASE_URL}/api/feedback/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          rating: formData.rating,
+        }),
       });
-    }, 3000);
 
-    // Confetti
-    const colors = ['#7c3aed', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#f59e0b'];
-    for (let i = 0; i < 25; i++) {
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to submit feedback');
+      }
+
+      setSubmitted(true);
+      toast('🎉 Thank you for your feedback!');
+      
+      // Reset form after 3 seconds
       setTimeout(() => {
-        const el = document.createElement('div');
-        el.style.cssText = `
-          position: fixed;
-          left: ${Math.random() * 100}vw;
-          top: 0;
-          width: ${6 + Math.random() * 10}px;
-          height: ${6 + Math.random() * 10}px;
-          background: ${colors[Math.floor(Math.random() * colors.length)]};
-          border-radius: ${Math.random() > 0.5 ? '50%' : '3px'};
-          z-index: 9999;
-          pointer-events: none;
-          animation: cfF ${1 + Math.random() * 0.8}s ease ${Math.random() * 0.4}s forwards;
-        `;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 2500);
-      }, i * 30);
+        setSubmitted(false);
+        setFormData({
+          name: state.user?.name || '',
+          email: state.user?.email || '',
+          category: 'general',
+          rating: 5,
+          message: ''
+        });
+      }, 3000);
+
+      // Confetti
+      const colors = ['#7c3aed', '#ec4899', '#f97316', '#10b981', '#06b6d4', '#f59e0b'];
+      for (let i = 0; i < 25; i++) {
+        setTimeout(() => {
+          const el = document.createElement('div');
+          el.style.cssText = `
+            position: fixed;
+            left: ${Math.random() * 100}vw;
+            top: 0;
+            width: ${6 + Math.random() * 10}px;
+            height: ${6 + Math.random() * 10}px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            border-radius: ${Math.random() > 0.5 ? '50%' : '3px'};
+            z-index: 9999;
+            pointer-events: none;
+            animation: cfF ${1 + Math.random() * 0.8}s ease ${Math.random() * 0.4}s forwards;
+          `;
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 2500);
+        }, i * 30);
+      }
+    } catch (err: any) {
+      toast(err.message || 'Failed to submit feedback');
     }
   };
 
