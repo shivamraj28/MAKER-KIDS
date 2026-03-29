@@ -28,13 +28,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Load state from localStorage
+  // Load state from localStorage (excluding user for session-only auth)
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setState(prev => ({ ...prev, ...parsed }));
+        // Don't restore user from localStorage - user should log in fresh each session
+        setState(prev => ({ 
+          ...prev, 
+          pts: parsed.pts || 0,
+          done: parsed.done || [],
+          badges: parsed.badges || JSON.parse(JSON.stringify(INITIAL_BADGES)),
+          claimable: parsed.claimable || false
+        }));
       } catch (e) {
         console.error('Failed to load state', e);
       }
@@ -47,9 +54,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  // Save state to localStorage
+  // Save state to localStorage (excluding user for session-only auth)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const stateToSave = {
+      pts: state.pts,
+      done: state.done,
+      badges: state.badges,
+      claimable: state.claimable
+      // Note: user is not saved to localStorage for session-only authentication
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
   }, [state]);
 
   const updateUser = (user: User | null) => {
